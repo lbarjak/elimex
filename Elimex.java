@@ -24,7 +24,7 @@ public class Elimex implements GlobalVariables {
 
     public static void readHangzavarXLSX() throws FileNotFoundException, OpenXML4JException {
 
-        String xlsxName = "hangzavar-xlsx-export-2019-10-21_12_53_20.xlsx";
+        String xlsxName = "hangzavar-xlsx-export-2020-01-07_15_28_01.xlsx";
         try {
             new FromXLSX().read(xlsxName, HANGZAVAR_MAP);
         } catch (IOException | InvalidFormatException ex) {
