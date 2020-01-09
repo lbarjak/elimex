@@ -26,7 +26,7 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 			"NBB-75DFIB", "NC-3FP1", "NC-5FDL1", "NC-5FX", "NC-5MDL1", "NC-5MX", "NDJ-1", "NL-8FC", "KL-D10KL",
 			"NE-8FDP", "NE-8FDPB", "NE-8FDVYK", "NE-8FDYC6", "NE-8FDYC6B", "NE-8MC"));
 
-	StringBuilder oldal;
+	//StringBuilder oldal;
 
 	public void stockType() {
 		ELIMEX_HT.put("raktáron", "1-2 nap");
@@ -87,21 +87,13 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 			ArrayList<String> v = ELIMEX_MAP.get(k);
 			System.out.println(k);
 
-			oldal = new StringBuilder();
+			String oldal = oldalak(k);
 
-			URL url = new URL("https://elimex.hu/gyorskereses?q=" + k);
-			BufferedReader in;
-			in = new BufferedReader(new InputStreamReader(url.openStream()));
-			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
-				oldal.append(inputLine);
-			}
-
-			if (oldal.toString().contains("Nincs a keresésnek megfelelő találat.")) {
+			if (oldal.contains("Nincs a keresésnek megfelelő találat.")) {
 				nincs.add(k + ";" + v.get(indexOfRaktarkeszlet1).toString().replace(".0", "") + ";"
 						+ v.get(indexOfStátusz).toString().replace(".0", ""));
 			} else {
-				search(k, oldal.toString());
+				search(k, oldal);
 			}
 //            if(counter == 20) {
 //                break;
@@ -118,18 +110,23 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 		nincsToScreen();
 	}
 
-	public void nincsToScreen() {
-
-		System.out.println("Ezek nálunk vannak de az Elimex-en nincsenek fent + Raktárkészlet 1 + Státusz:");
-		for (int i = 0; i < nincs.size(); i++) {
-			System.out.println(nincs.get(i));
+	public String oldalak(String k) throws MalformedURLException, IOException {
+		URL url = new URL("https://elimex.hu/gyorskereses?q=" + k);
+		StringBuilder oldal = new StringBuilder();
+		BufferedReader in;
+		in = new BufferedReader(new InputStreamReader(url.openStream()));
+		String inputLine;
+		while ((inputLine = in.readLine()) != null) {
+			oldal.append(inputLine);
 		}
+		return oldal.toString();
 	}
 
-	public void search(String k, String page) {
+	public void search(String k, String oldal) {
 
 		Document doc = Jsoup.parse(oldal.toString());
 		String bodyText = doc.body().text();
+		System.out.println(bodyText);//csak tesztnél
 		ArrayList<String> row = new ArrayList<>(Arrays.asList(k, ""));
 		String match_a_nincsKeszletenAllapot = "";
 		String match_b_kifutoTipusRaktáron = "";
@@ -165,8 +162,11 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 					match_b_kifutoTipusRaktáron = " " + matcher_b_kifutoTipusRaktaron.group();
 				}
 			}
+			System.out.println(">" + match_a_nincsKeszletenAllapot);//csak tesztnél
 			match_a_nincsKeszletenAllapot += match_b_kifutoTipusRaktáron;
+			System.out.println(">>" + match_a_nincsKeszletenAllapot);//csak tesztnél
 			match_a_nincsKeszletenAllapot = ELIMEX_HT.get(match_a_nincsKeszletenAllapot);
+			System.out.println(">>>" + match_a_nincsKeszletenAllapot);//csak tesztnél
 			row.set(1, match_a_nincsKeszletenAllapot);
 
 			if (matcher_c_bruttoAlapar.find()) {
@@ -176,12 +176,25 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 				integerNettoAlapar = (int) ((Double.parseDouble(match_c_bruttoAlapar.replace(" ", "")) + 0.5) / 1.27);
 				// integerNettoAlaparString = integerNettoAlapar.toString();
 			}
-			if (integerNettoAlapar > 0) {
-				ELIMEX_UPLOAD_TO_SHOPRENTER.get("export").put(k, row);
-				toNetsoft.add(k + ";" + integerNettoAlapar);
-
-				System.out.println(counter + " " + (100 * counter++ / 2281));
+//			if (integerNettoAlapar > 0) {//csak élesben
+//				ELIMEX_UPLOAD_TO_SHOPRENTER.get("export").put(k, row);
+//				toNetsoft.add(k + ";" + integerNettoAlapar);
+//
+//				System.out.println(counter + " " + (100 * counter++ / 2281));
+//			}
+			if (integerNettoAlapar > 0) {//csak tesztnél
+				//https://elimex.hu/gyorskereses?q=RO-DR010
+				System.out.println(integerNettoAlapar);
+				System.out.println(row);
 			}
+		}
+	}
+	
+	public void nincsToScreen() {
+
+		System.out.println("Ezek nálunk vannak de az Elimex-en nincsenek fent + Raktárkészlet 1 + Státusz:");
+		for (int i = 0; i < nincs.size(); i++) {
+			System.out.println(nincs.get(i));
 		}
 	}
 
@@ -201,3 +214,4 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 	}
 }
 //0 árú termékek?
+//develop branch

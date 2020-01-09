@@ -2,6 +2,7 @@ package elimex;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,8 @@ public class Elimex implements GlobalVariables {
 
         readHangzavarXLSX();
 
-        new HangtechnikaToElimexQuery().query();
+        //new HangtechnikaToElimexQuery().query();
+        test();
 
         Date stop = new Date();
         new Dates().diff(start, stop);
@@ -31,4 +33,13 @@ public class Elimex implements GlobalVariables {
             Logger.getLogger(Elimex.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public static void test() throws MalformedURLException, IOException {
+    	String cikkszam = "WM-EAP3CJ3P3BMG";//RO-DR010, NE-NA3F5M, WM-EAP3CJ3P3BMG
+    	HangtechnikaToElimexQuery test = new HangtechnikaToElimexQuery();
+    	test.stockType();
+    	String oldal = test.oldalak(cikkszam);
+    	test.search(cikkszam, oldal);
+    }
 }
+//develop branch
