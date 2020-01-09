@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
@@ -19,7 +20,7 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 	int counter = 0;
 
 	final ArrayList<String> gyartokElimex = new ArrayList<>(Arrays.asList("Adam Hall", "BMS", "Elimex", "Eminence",
-			"Gravity", "ID-AL", "Klotz", "König & Meyer", "LD Systems", "Neutrik", "NTI Audio", "Palmer", "WorldMix"));
+			"Gravity", "ID-AL", "Klotz", "König & Meyer", "LD Systems", "Neutrik", "NTI Audio", "Palmer", "Robust", "WorldMix"));
 
 	final ArrayList<String> exclude = new ArrayList<>(Arrays.asList("PA-PCAB212**", "PA-PCAB212OB**",
 			"KL-LY225S, fekete", "KM-23110-316-55/CR", "NTE-10/3", "NTE-1", "KL-VD062SH", "NA-3FDM", "NA-3MDF",
@@ -74,9 +75,10 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 		ELIMEX_UPLOAD_TO_SHOPRENTER.get("columns").put("Cikkszám",
 				new ArrayList<>(Arrays.asList("Cikkszám", "Nincs készleten állapot")));
 
-		for (String k : HANGZAVAR_MAP.get("export").keySet()) {
+		Set<String> hangzavarMapKeyset = HANGZAVAR_MAP.get("export").keySet();
+		
+		for (String k : hangzavarMapKeyset) {
 			ArrayList<String> v = HANGZAVAR_MAP.get("export").get(k);
-
 			if (v.get(indexOfGyarto) != null && gyartokElimex.contains((String) v.get(indexOfGyarto))
 					&& !exclude.contains(k)) {
 				ELIMEX_MAP.put(k, v);
@@ -103,9 +105,6 @@ public class HangtechnikaToElimexQuery implements GlobalVariables {
 			} else {
 				search(k, oldal.toString());
 			}
-//            if(counter == 20) {
-//                break;
-//            }
 		}
 
 		CopyToXLSX copytoxlsx_elimex = new CopyToXLSX();
